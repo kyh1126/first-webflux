@@ -1,0 +1,15 @@
+#spring:
+#  r2dbc:
+#    url: r2dbc:pool:mysql://localhost:3306/
+#    username: root
+#    password: password
+
+spring:
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/demodb
+#    username: root
+#    password: root
+  h2:
+    console:
+      enabled: true # Enabling H2 Console http://localhost:8080/h2
+#      path: /h2
