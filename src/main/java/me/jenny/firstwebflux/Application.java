@@ -11,6 +11,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryInitializer;
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -20,6 +23,12 @@ import java.util.Arrays;
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
+    }
+
+
+    @Bean
+    public WebClient webClient() {
+        return WebClient.create("http://127.0.0.1:8080");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -93,6 +102,81 @@ public class Application {
             }).blockLast(Duration.ofSeconds(10));
 
             log.info("");
+
         };
     }
+
+    /**
+     * WebClient Usage GET
+     *
+     * @see <a href="https://github.com/arungangadharan/myhobbies/blob/968e3c8c04c83a573b89a86296bf4f17a8a6413c/DemoApplication.java">Github example</a>
+     */
+    @Bean
+    public CommandLineRunner commandLineRunnerGET(WebClient webClient) {
+        return (args) -> {
+            Mono<String> mono = webClient
+                    .get()
+                    .uri("/bye")
+                    .retrieve()
+                    .bodyToMono(String.class);
+
+            // Synchronous
+            String result = mono.block();
+            System.out.println("result: " + result);
+
+            // Asynchronous
+            mono.timeout(Duration.ofNanos(1))
+                    .subscribe(
+                            body -> System.out.println("Response is " + body),
+                            e -> System.out.println("timeout!"));
+        };
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunnerPOST(WebClient webClient) {
+        Mono<String> data = Mono.just("mono data!");
+
+        return (args) -> {
+            Mono<String> mono = webClient
+                    .post()
+                    .uri("/bye")
+                    .body(data, String.class)
+                    .retrieve()
+                    .bodyToMono(String.class);
+
+            mono.subscribe(body -> System.out.println("Response is " + body));
+        };
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunnerPUT(WebClient webClient) {
+        return (args) -> {
+            Mono<String> monoData = Mono.just("put body");
+            Mono<Void> mono = webClient
+                    .put()
+                    .uri("/bye")
+                    .body(monoData, String.class)
+                    .retrieve()
+                    .onStatus(status -> status == HttpStatus.NOT_FOUND,
+                            response -> Mono.just(new UnknownError("custom error")))
+                    .bodyToMono(Void.class);
+
+            mono.subscribe(body -> System.out.println("Response is " + body));
+        };
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunnerDELETE(WebClient webClient) {
+        return (args) -> {
+            Mono<Void> mono = webClient
+                    .delete()
+                    .uri("/bye/{id}", 1L)
+                    .retrieve()
+                    .onStatus(HttpStatus::is4xxClientError, response -> Mono.just(new UnknownError("custom error")))
+                    .bodyToMono(Void.class);
+
+            mono.subscribe(body -> System.out.println("Response is " + body));
+        };
+    }
+
 }
