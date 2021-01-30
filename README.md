@@ -13,3 +13,6 @@
 - Spring WebFlux
     - version: 5.3.3
     - reference: https://docs.spring.io/spring-framework/docs/5.3.3/reference/html/web-reactive.html#spring-webflux
+
+- Spring Data R2DBC
+    - run: 'gradle bootRun -PsessionStore=r2dbc'
