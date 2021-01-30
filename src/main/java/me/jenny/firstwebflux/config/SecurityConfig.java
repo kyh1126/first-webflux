@@ -27,6 +27,7 @@ public class SecurityConfig {
                 exchanges
                         .pathMatchers("/assets/**").permitAll()
                         .pathMatchers("/login").permitAll()
+                        .pathMatchers("/bye/**").permitAll()
                         .anyExchange().authenticated()
         )
                 .formLogin().loginPage("/login")

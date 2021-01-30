@@ -13,6 +13,7 @@ import org.springframework.data.r2dbc.connectionfactory.init.ConnectionFactoryIn
 import org.springframework.data.r2dbc.connectionfactory.init.ResourceDatabasePopulator;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -28,7 +29,7 @@ public class Application {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.create("http://127.0.0.1:8080");
+        return WebClient.create("http://localhost:8080");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -76,10 +77,15 @@ public class Application {
                     new Customer("Michelle", "Dessler")))
                     .blockLast(Duration.ofSeconds(10));
 
+            // save a few customers with subscribe
+            Flux.fromIterable(Arrays.asList(new Customer("Jack2", "Bauer2"), new Customer("Chloe2", "O'Brian2")))
+                    .subscribe(repository::save);
+
             // fetch all customers
             log.info("Customers found with findAll():");
             log.info("-------------------------------");
-            repository.findAll().doOnNext(customer -> {
+            Flux<Customer> all = repository.findAll();
+            all.doOnNext(customer -> {
                 log.info(customer.toString());
             }).blockLast(Duration.ofSeconds(10));
 
