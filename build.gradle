@@ -33,7 +33,6 @@ dependencies {
 //    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 //    implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
 //    implementation 'org.springframework.boot:spring-boot-starter-data-cassandra-reactive'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
     sessionStores[project.findProperty("sessionStore") ?: "mongodb"].each { implementation it }
 
 

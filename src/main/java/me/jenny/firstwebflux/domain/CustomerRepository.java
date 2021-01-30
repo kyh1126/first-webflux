@@ -1,8 +1,9 @@
 package me.jenny.firstwebflux.domain;
 
 //import org.springframework.data.cassandra.repository.Query;
+
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.r2dbc.repository.Query;
-//import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 
